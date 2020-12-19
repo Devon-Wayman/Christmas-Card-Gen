@@ -38,8 +38,8 @@ def ParseToJson():
     input_file = open('Sheet1.json') # Use first (and only) json file to load data from
 
     if enableVerbose: Helpers.VerbosePrint("Loading JSON file into dictionary")
-    contactDict = json.load(input_file)
-    GenerateDocuments(contactDict)
+    contactDict = json.load(input_file) # Load the JSON data into a formatted dictionary
+    GenerateDocuments(contactDict) # Begin generating new Word docs using the passed in data
 
 # Load Word doc template and apply changes from contacts dictionary
 def GenerateDocuments(contactDict):
@@ -48,10 +48,10 @@ def GenerateDocuments(contactDict):
     # { "find this text": "replace with this text" }
     ReplacementDictionary = {"Family Name Here": "FamilyName", "Address Line 1": "AddressLine1", "Address Line 2": "AddressLine2"}
 
-    familyIndex = 0
+    familyIndex = 0 # Index number to grab cooresponding family's data from the contacts dictionary when replacing text
 
     for contact in contactDict:
-        doc = docx.Document(word_template_name)
+        doc = docx.Document(word_template_name) # Open the UNMODIFIED Word doc template
         run = doc.add_paragraph().add_run() # Allow a run to be used on modified text
         style = doc.styles['Normal'] # Normal styling applied
         font = style.font # Accessor to font face
@@ -69,8 +69,8 @@ def GenerateDocuments(contactDict):
         for i in ReplacementDictionary:
             for p in doc.paragraphs:
                 if p.text.find(i) >= 0:
-                    p.text = p.text.replace(i, contact[ReplacementDictionary[i]])
-                    p.add_run()
+                    p.text = p.text.replace(i, contact[ReplacementDictionary[i]]) # replace detected text accordingly
+                    p.add_run() # run text formatting on the newly replaced document text
 
         familyIndex += 1
         fileName = Helpers.RemoveAllSpaces(str(contact["FamilyName"]))
