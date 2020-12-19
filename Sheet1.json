@@ -1,0 +1,17 @@
+[
+    {
+        "FamilyName": "The Wayman Family",
+        "AddressLine1": "11526 Misty Meadows Dr",
+        "AddressLine2": "Cato, NY 13033"
+    },
+    {
+        "FamilyName": "Another Family",
+        "AddressLine1": "Non-existent Address",
+        "AddressLine2": "Yeah Boiiiii"
+    },
+    {
+        "FamilyName": "Some Other Fam",
+        "AddressLine1": "Yeah",
+        "AddressLine2": "Yup"
+    }
+]
