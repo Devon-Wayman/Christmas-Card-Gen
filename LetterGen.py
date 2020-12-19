@@ -3,97 +3,58 @@ from excel2json import convert_from_file
 import json
 import docx
 from time import sleep
-import sys
-from os import system, name 
-from datetime import datetime
+import Helpers
 
 word_template_name = ""
 excel_doc_name = ""
-enableVerboseOutput = False # Enable/disable verbose console output
+enableVerbose = False # Enable/disable verbose console output
+	
+# Check if all entered file names can be found
+def AllFilesExist():
+    if os.path.isfile(word_template_name) and os.path.isfile(excel_doc_name):
+        return True
+    else:
+        return False
 
-# Verbose console output formatter
-def VerbosePrint(message):
-    now = datetime.now()
-    dt_string = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
-    print ("[" + dt_string + "] " + message)	
-
-# Retrieve document names
-def GetWordDocName():
-    name = input("Name of the Word doc template:")
-    return name.strip()
-def GetExcelDocName():
-    name = input("Name of the Excel doc containing data to parse:")
-    return name.strip()
-
-# Set custom bool values
 def AskVerbose():
     response = input ("Would you like to enable verbose console output (y/n): ").strip().lower()
-
     if response == 'y':
         return True
     elif response == 'n':
         return False
     else:
         print("Illegal entry. We will go with No to keep things clean")
-
-# Clear screen
-def ClearScreen(): 
-    # for windows 
-    if name == 'nt': 
-        _ = system('cls') 
-    # for mac and linux
-    else: 
-        _ = system('clear') 
-
-# Source file checks
-def CheckForExcelDoc():
-    if os.path.isfile('contacts.xlsx'):
-        return True
-    else:
         return False
-def CheckForWordTempate():
-    if os.path.isfile(word_template_name):
-        return True
-    else:
-        return False
-
-def RemoveAllSpaces(string):
-    return string.replace(" ", "")
 
 # Parse Excel sheet to JSON
 def ParseToJson():
-    if enableVerboseOutput == True:
-        VerbosePrint("Attempting to convert Word doc to JSON...")
+    print("Parsing Excel sheet contents and generating Word docs from template")
+
+    if enableVerbose == True: Helpers.VerbosePrint("Attempting to convert Word doc to JSON...")
 
     try:
         convert_from_file(excel_doc_name)
     except Exception as err:
-        print("Error parsing content: " + err + "Exiting program...")
-        sleep(3)
+        Helpers.PrintError(f"Error parsing content: {err}.\nExiting program...")
         exit(0)
 
-    if enableVerboseOutput == True:
-        VerbosePrint("Opening Sheet1.json (default Excel workbook name)")
+    if enableVerbose == True: Helpers.VerbosePrint("Opening Sheet1.json (default Excel workbook name)")
 
     input_file = open('Sheet1.json') # Use first (and only) json file to load data from
     contactDict = json.load(input_file)
-
     GenerateDocuments(contactDict)
 
-# Modify Word doc template and save out changes to new file in generated_docs folder
+# Load Word doc template and apply changes from contacts dictionary
 def GenerateDocuments(contactDict):
-    if enableVerboseOutput == True:
-        VerbosePrint("Beginning Word doc generation...")
+    if enableVerbose == True: Helpers.VerbosePrint("Beginning Word doc generation...")
 
     # { "find this text": "replace with this text" }
     ReplacementDictionary = {"Family Name Here": "FamilyName", "Address Line 1": "AddressLine1", "Address Line 2": "AddressLine2"}
 
     familyIndex = 0
-    familyFileName = ""
 
     for contact in contactDict:
         doc = docx.Document(word_template_name)
-
         run = doc.add_paragraph().add_run() # Allow a run to be used on modified text
         style = doc.styles['Normal'] # Normal styling applied
         font = style.font # Accessor to font face
@@ -101,59 +62,38 @@ def GenerateDocuments(contactDict):
         font.name = 'Cavolini' # Set font face
         font.size = docx.shared.Pt(11) # Set font size
 
-        if enableVerboseOutput == True:
-            VerbosePrint("Formatting " + contactDict[familyIndex]["FamilyName"])
+        if enableVerbose == True: Helpers.VerbosePrint("Formatting " + contactDict[familyIndex]["FamilyName"])
         
         for i in ReplacementDictionary:
             for p in doc.paragraphs:
                 if p.text.find(i) >= 0:
                     p.text = p.text.replace(i, contact[ReplacementDictionary[i]])
                     p.add_run()
+
         familyIndex += 1
+        fileName = Helpers.RemoveAllSpaces(str(contact["FamilyName"]))
 
-        familyFileName = RemoveAllSpaces(str(contact["FamilyName"]))
-
-        if enableVerboseOutput == True:
-            VerbosePrint("Attempting to save " + familyFileName + ".docx")
+        if enableVerbose == True:
+            Helpers.VerbosePrint(f"Attempting to save {fileName}.docx")
 
         try:
-            doc.save("generated_docs/" + familyFileName + ".docx")
+            doc.save(f"generated_docs/{fileName}.docx")
         except IOError as ex:
-            print("Error saving generated document for " + familyFileName +": " + ex)
+            Helpers.PrintError(f"Error saving generated document for {fileName}: {ex}")
 
     print("Process completed. Check generated_docs folder for final outputs.")
 
-
 if __name__ == "__main__":
-    # Ask user for Word doc name
-    word_template_name = GetWordDocName()
+    Helpers.ClearScreen()
+    word_template_name = Helpers.GetUserInput("Please enter name of Word doc template: ", False)
+    excel_doc_name = Helpers.GetUserInput("Please enter name of Excel doc to rip data from: ", False)
 
-    # Ask user for Excel file name
-    excel_doc_name = GetExcelDocName()
+    if AllFilesExist() == False:
+        Helpers.PrintError("Could not find excel doc with matching name. Please run the script and try again...")
+        sleep(5)
+        exit(0)
 
-    if CheckForExcelDoc() == False:
-        error_response = input("Could not find excel doc with matching name. Would you like to try again? y/n").strip().lower()
-        if error_response == 'y':
-            ClearScreen()
-            os.execv(sys.argv[0], sys.argv)
-        elif error_response == 'n':
-            exit(0)
-        else:
-            exit(0)
-
-    if CheckForWordTempate() == False:
-        error_response = input("Could not find Word doc with matching name. Would you like to try again? y/n").strip().lower()
-        if error_response == 'y':
-            ClearScreen()
-            os.execv(sys.argv[0], sys.argv)
-        elif error_response == 'n':
-            exit(0)
-        else:
-            exit(0)
-
-    enableVerboseOutput = AskVerbose() 
-
-    print("All required files found. Parsing Excel sheet contents and generating Word docs from template")
-    sleep(3)
+    enableVerbose = AskVerbose() 
+    sleep(1)
     ParseToJson()
 
