@@ -28,10 +28,35 @@ def PrintError(message):
 def RemoveAllSpaces(string):
     return string.replace(" ", "")
 
-# Used to return user input. Can also be passed in a message to print before entry region renders
+
+# Return string value from user input
 def GetUserInput(requestMessage, printAsError):
     if printAsError:
         userIn = input(f"{bcolors.WARNING}{requestMessage}{bcolors.ENDC}")
     else:
         userIn = input(requestMessage)
     return userIn.strip()
+    
+# Ask user to set a bool value to true or false
+def SetBool(message):
+    userInput = input(message)
+    userInput = userInput.strip().lower()
+    if userInput == 'y':
+        return True
+    elif userInput == 'n':
+        return False
+    else:
+        print("Illegal entry. We will go with No as a default")
+        return False
+
+# Ask a user to set an int value
+def SetInt(message):
+    userInput = input(message)
+    userInput = userInput.strip().lower()
+    
+    if userInput == "":
+        return 11
+
+    return int(userInput)
+
+    
