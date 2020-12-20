@@ -26,9 +26,15 @@ def VerbosePrint(message):
 def PrintError(message):
     print(f"{bcolors.WARNING}{message}{bcolors.ENDC}")
 
+# Finds first file in root directory and returns name
+def SetDefaultFile(extension):
+    for file in os.listdir('.'):
+            if file.endswith(extension):
+                return str(file)
+
+# Remove all spaces in a string
 def RemoveAllSpaces(string):
     return string.replace(" ", "")
-
 
 # Return string value from user input
 def GetUserInput(requestMessage, printAsError):
@@ -60,6 +66,7 @@ def SetInt(message):
 
     return int(userInput)
 
+# Checks for folder to store generated documents in
 def CheckForGenDocsFolder():
     if os.path.isdir('generated_docs'):
         return

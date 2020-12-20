@@ -44,8 +44,6 @@ def ParseToJson():
     except Exception as ex:
         Helpers.PrintError(f"Error parting data: {ex}. Exiting...")
         exit(0)
-        
-    
     
     GenerateDocuments(contactDict) # Begin generating new Word docs using the passed in data
 
@@ -94,15 +92,21 @@ def GenerateDocuments(contactDict):
 
 if __name__ == "__main__":
     Helpers.ClearScreen()
-
     Helpers.CheckForGenDocsFolder()
 
-    word_template_name = Helpers.GetUserInput("Please enter name of Word doc template: ", False)
-    excel_doc_name = Helpers.GetUserInput("Please enter name of Excel doc to rip data from: ", False)
+    word_template_name = Helpers.GetUserInput("Enter name of Word doc template (Leave blank to select first doc found): ", False)
+    if word_template_name == "":
+        word_template_name = Helpers.SetDefaultFile(".docx")
+        print(f"Empty entry given. Set file template to {word_template_name}")
+
+    excel_doc_name = Helpers.GetUserInput("Enter name of Excel doc to rip data from (Leave blank to select first doc found): ", False)
+    if excel_doc_name == "":
+        excel_doc_name = Helpers.SetDefaultFile(".xlsx")
+        print(f"Empty entry given. Set file template to {excel_doc_name}")
 
     if not AllFilesExist():
         Helpers.PrintError("Could not find excel doc with matching name. Please re-run the script and try again...")
-        sleep(5)
+        sleep(3)
         exit(0)
 
     enableVerbose = Helpers.SetBool("Would you like to enable verbose console output (y/n)? ")
