@@ -92,7 +92,10 @@ def GenerateDocuments(contactDict):
 
 if __name__ == "__main__":
     Helpers.ClearScreen()
+
     Helpers.CheckForGenDocsFolder()
+
+    Helpers.ClearScreen()
 
     word_template_name = Helpers.GetUserInput("Enter name of Word doc template (Leave blank to select first doc found): ", False)
     if word_template_name == "":

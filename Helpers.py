@@ -1,6 +1,7 @@
 from os import system, name 
 from datetime import datetime
 import os
+from time import sleep
 
 class bcolors:
     HEADER = '\033[95m'
@@ -67,10 +68,27 @@ def SetInt(message):
     return int(userInput)
 
 # Checks for folder to store generated documents in
+# If files exist, the user can delete them
 def CheckForGenDocsFolder():
+    filesFound = 0
     if os.path.isdir('generated_docs'):
-        return
+        for file in os.listdir('generated_docs/'):
+            filesFound += 1
+
+        if filesFound > 0:
+            response = input ("Files found in generated_docs folder. Would you like to delete them (y/n): ").strip().lower()
+            if response == 'y':
+                DeleteDocs('generated_docs/')
+            elif response == 'n':
+                return
     else:
         PrintError("Main folder for generated docs not found. Creating now...")
         os.mkdir('generated_docs')
-        return False
+
+def DeleteDocs(path):
+    for file in os.listdir(path):
+        if file.endswith('.docx'):
+            file = file.strip()
+            print(f"Deleting {file}")
+            os.remove(path + file)
+    sleep(2)
