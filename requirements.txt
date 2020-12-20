@@ -1,2 +1,3 @@
 python-docx
-excel2json
+excel2json-3
+xlrd==1.2.0

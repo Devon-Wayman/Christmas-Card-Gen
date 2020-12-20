@@ -38,7 +38,15 @@ def ParseToJson():
     input_file = open('Sheet1.json') # Use first (and only) json file to load data from
 
     if enableVerbose: Helpers.VerbosePrint("Loading JSON file into dictionary")
-    contactDict = json.load(input_file) # Load the JSON data into a formatted dictionary
+    
+    try:
+        contactDict = json.load(input_file) # Load the JSON data into a formatted dictionary
+    except Exception as ex:
+        Helpers.PrintError(f"Error parting data: {ex}. Exiting...")
+        exit(0)
+        
+    
+    
     GenerateDocuments(contactDict) # Begin generating new Word docs using the passed in data
 
 # Load Word doc template and apply changes from contacts dictionary
@@ -86,6 +94,9 @@ def GenerateDocuments(contactDict):
 
 if __name__ == "__main__":
     Helpers.ClearScreen()
+
+    Helpers.CheckForGenDocsFolder()
+
     word_template_name = Helpers.GetUserInput("Please enter name of Word doc template: ", False)
     excel_doc_name = Helpers.GetUserInput("Please enter name of Excel doc to rip data from: ", False)
 

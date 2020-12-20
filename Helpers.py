@@ -1,5 +1,6 @@
 from os import system, name 
 from datetime import datetime
+import os
 
 class bcolors:
     HEADER = '\033[95m'
@@ -59,4 +60,10 @@ def SetInt(message):
 
     return int(userInput)
 
-    
+def CheckForGenDocsFolder():
+    if os.path.isdir('generated_docs'):
+        return
+    else:
+        PrintError("Main folder for generated docs not found. Creating now...")
+        os.mkdir('generated_docs')
+        return False
