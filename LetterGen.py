@@ -90,6 +90,7 @@ def GenerateDocuments(contactDict):
 
     print("\nProcess completed. Check generated_docs folder for final outputs.\n")
 
+
 if __name__ == "__main__":
     Helpers.ClearScreen()
 
@@ -119,4 +120,7 @@ if __name__ == "__main__":
 
     sleep(1)
     ParseToJson()
+
+
+    
 
